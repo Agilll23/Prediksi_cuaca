@@ -12,8 +12,6 @@ Aplikasi web sederhana ini dibangun menggunakan Flask untuk memprediksi tipe cua
 * [Cara Menjalankan Aplikasi](#-cara-menjalankan-aplikasi)
 * [Cara Menggunakan Aplikasi](#-cara-menggunakan-aplikasi)
 * [Detail Model](#-detail-model)
-* [Screenshot (Opsional)](#-screenshot-opsional)
-* [Pengembangan Lebih Lanjut (Opsional)](#-pengembangan-lebih-lanjut-opsional)
 * [Kontributor](#-kontributor)
 
 ## 🛠️ Teknologi yang Digunakan
