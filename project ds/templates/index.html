@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediksi Tipe Cuaca</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; }
+        form { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        label { font-weight: bold; margin-bottom: 5px; display: block; }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #5cb85c;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover { background-color: #4cae4c; }
+        .hasil {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9e9e9;
+            border-left: 5px solid #5cb85c;
+            border-radius: 4px;
+        }
+        .hasil h2 { margin-top: 0; }
+        .error { border-left-color: #d9534f; background-color: #f2dede; color: #a94442; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px;}
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd;}
+        th { background-color: #f0f0f0; }
+        .grafik-container { width: 75%; max-width: 600px; margin: 20px auto; padding: 10px; border: 1px solid #eee; border-radius: 4px; background-color: #fff;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Prediksi Tipe Cuaca</h1>
+        <form action="{{ url_for('predict') }}" method="post">
+            <div>
+                <label for="Temperature">Suhu (°C):</label>
+                <input type="number" step="0.1" id="Temperature" name="Temperature" value="{{ data_input_sebelumnya.Temperature if data_input_sebelumnya else '' }}" required>
+            </div>
+            <div>
+                <label for="Humidity">Kelembapan (%):</label>
+                <input type="number" id="Humidity" name="Humidity" value="{{ data_input_sebelumnya.Humidity if data_input_sebelumnya else '' }}" required>
+            </div>
+            <div>
+                <label for="Wind_Speed">Kecepatan Angin (km/h):</label>
+                <input type="number" step="0.1" id="Wind_Speed" name="Wind_Speed" value="{{ data_input_sebelumnya.Wind_Speed if data_input_sebelumnya else '' }}" required>
+            </div>
+            <div>
+                <label for="Precipitation (%)">Presipitasi (%):</label>
+                <input type="number" step="0.1" id="Precipitation (%)" name="Precipitation (%)" value="{{ data_input_sebelumnya['Precipitation (%)'] if data_input_sebelumnya else '' }}" required>
+            </div>
+            <div>
+                <label for="Cloud_Cover">Tutupan Awan:</label>
+                <select id="Cloud_Cover" name="Cloud_Cover" required>
+                    <option value="">-- Pilih Tutupan Awan --</option>
+                    {% if fitur_kategorikal and 'Cloud_Cover' in fitur_kategorikal and fitur_kategorikal['Cloud_Cover'] %}
+                        {% for class_val in fitur_kategorikal['Cloud_Cover'].classes_ %}
+                            <option value="{{ class_val }}" {% if data_input_sebelumnya and data_input_sebelumnya.Cloud_Cover == class_val %}selected{% endif %}>{{ class_val|capitalize }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div>
+                <label for="Atmospheric_Pressure">Tekanan Atmosfer (hPa):</label>
+                <input type="number" step="0.01" id="Atmospheric_Pressure" name="Atmospheric_Pressure" value="{{ data_input_sebelumnya.Atmospheric_Pressure if data_input_sebelumnya else '' }}" required>
+            </div>
+            <div>
+                <label for="UV_Index">Indeks UV:</label>
+                <input type="number" id="UV_Index" name="UV_Index" value="{{ data_input_sebelumnya.UV_Index if data_input_sebelumnya else '' }}" required>
+            </div>
+            <div>
+                <label for="Season">Musim:</label>
+                <select id="Season" name="Season" required>
+                    <option value="">-- Pilih Musim --</option>
+                     {% if fitur_kategorikal and 'Season' in fitur_kategorikal and fitur_kategorikal['Season'] %}
+                        {% for class_val in fitur_kategorikal['Season'].classes_ %}
+                            <option value="{{ class_val }}" {% if data_input_sebelumnya and data_input_sebelumnya.Season == class_val %}selected{% endif %}>{{ class_val|capitalize }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div>
+                <label for="Visibility_KM">Visibilitas (KM):</label>
+                <input type="number" step="0.1" id="Visibility_KM" name="Visibility_KM" value="{{ data_input_sebelumnya.Visibility_KM if data_input_sebelumnya else '' }}" required>
+            </div>
+            <div>
+                <label for="Location">Lokasi:</label>
+                <select id="Location" name="Location" required>
+                    <option value="">-- Pilih Lokasi --</option>
+                     {% if fitur_kategorikal and 'Location' in fitur_kategorikal and fitur_kategorikal['Location'] %}
+                        {% for class_val in fitur_kategorikal['Location'].classes_ %}
+                            <option value="{{ class_val }}" {% if data_input_sebelumnya and data_input_sebelumnya.Location == class_val %}selected{% endif %}>{{ class_val|capitalize }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div style="grid-column: 1 / -1; text-align: center;">
+                 <input type="submit" value="Prediksi Cuaca">
+            </div>
+        </form>
+
+        {% if prediksi_teks %}
+            <div class="hasil {% if 'Error' in prediksi_teks %}error{% endif %}">
+                <h2>Hasil Prediksi:</h2>
+                <p>{{ prediksi_teks }}</p>
+                {% if probabilitas %}
+                    <h3>Probabilitas per Kelas (Tabel):</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipe Cuaca</th>
+                                <th>Probabilitas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for kelas, prob in probabilitas.items() %}
+                            <tr>
+                                <td>{{ kelas|capitalize }}</td>
+                                <td>{{ prob }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if prediksi_teks and labels_grafik and data_grafik %}
+        <div class="grafik-container">
+            <h3>Grafik Probabilitas Prediksi Cuaca</h3>
+            <canvas id="grafikPrediksiCuaca"></canvas> </div>
+        {% endif %}
+    </div> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    // Pastikan blok script ini hanya berjalan jika data untuk grafik benar-benar ada
+    {% if prediksi_teks and labels_grafik and data_grafik %}
+        try {
+            const ctx = document.getElementById('grafikPrediksiCuaca');
+            if (ctx) { // Pastikan elemen canvas ditemukan
+                const labels = {{ labels_grafik|tojson|safe }}; // Menggunakan filter tojson dan safe
+                const dataValues = {{ data_grafik|tojson|safe }};
+
+                // Cek di konsol browser apakah data diterima dengan benar
+                console.log("Data Label untuk Grafik:", labels);
+                console.log("Data Nilai untuk Grafik:", dataValues);
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels.map(label => String(label).charAt(0).toUpperCase() + String(label).slice(1)),
+                        datasets: [{
+                            label: 'Probabilitas (%)',
+                            data: dataValues.map(value => Number(value) * 100),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)', // Merah
+                                'rgba(54, 162, 235, 0.2)', // Biru
+                                'rgba(255, 206, 86, 0.2)', // Kuning
+                                'rgba(75, 192, 192, 0.2)', // Teal
+                                'rgba(153, 102, 255, 0.2)',// Ungu
+                                'rgba(255, 159, 64, 0.2)'  // Oranye
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + "%";
+                                    }
+                                }
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true, // Menampilkan legenda
+                                position: 'top',
+                            },
+                            title: {
+                                display: false, // Judul utama sudah ada di H3
+                            }
+                        }
+                    }
+                });
+            } else {
+                console.error("Elemen canvas 'grafikPrediksiCuaca' tidak ditemukan.");
+            }
+        } catch (e) {
+            console.error("Error saat membuat grafik:", e);
+        }
+    {% else %}
+        // Jika Anda ingin memberi tahu di konsol bahwa data grafik tidak ada (opsional)
+        // console.log("Data untuk grafik (labels_grafik atau data_grafik) tidak tersedia.");
+    {% endif %}
+    </script>       
+</body>
+</html>
