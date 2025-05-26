@@ -83,6 +83,12 @@ Aplikasi web sederhana ini dibangun menggunakan Flask untuk memprediksi tipe cua
 
 *(Jika Anda menggunakan port yang berbeda, sesuaikan alamat di atas.)*
 
+## 🚀 Cara Menggunakan Aplikasi
+
+1.  Setelah aplikasi terbuka di browser, Anda akan melihat formulir input.
+2.  Isi semua field yang diminta dengan data meteorologi yang relevan (Suhu, Kelembapan, Kecepatan Angin, dll.).
+3.  Klik tombol "**Prediksi Cuaca**".
+4.  Aplikasi akan menampilkan hasil prediksi tipe cuaca beserta tabel probabilitas per kelas dan grafik batang yang memvisualisasikan probabilitas tersebut.
 
 ## 🤖 Detail Model
 
