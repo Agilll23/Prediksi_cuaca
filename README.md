@@ -5,7 +5,6 @@ Aplikasi web sederhana ini dibangun menggunakan Flask untuk memprediksi tipe cua
 
 * [Fitur Utama](#-fitur-utama)
 * [Teknologi yang Digunakan](#-teknologi-yang-digunakan)
-* [Struktur Proyek](#-struktur-proyek)
 * [Instalasi dan Setup](#-instalasi-dan-setup)
     * [Prasyarat](#prasyarat)
     * [Langkah-langkah Instalasi](#langkah-langkah-instalasi)
